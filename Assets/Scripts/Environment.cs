@@ -35,6 +35,7 @@ public class Environment : MonoBehaviour
     public Button[] levelUpButtons;
     private int textIndex;
     private bool levelUpScreen;
+    private bool doorsShut = false;
 
     // Use this for initialization
     void Awake()
@@ -253,6 +254,7 @@ public class Environment : MonoBehaviour
     {
         return currentMp;
     }
+
     public void setIntCurrentMp(float mp)
     {
         maxMp = mp;
@@ -560,5 +562,15 @@ public class Environment : MonoBehaviour
             unlockedSkill[1] = true;
         LevelImage.SetActive(false);
         doingSetup = false;
+    }
+
+    public void setDoorsShut(bool areTheyShut)
+    {
+        doorsShut = areTheyShut;
+    }
+
+    public bool getDoorsShut()
+    {
+        return doorsShut;
     }
 }

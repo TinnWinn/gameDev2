@@ -20,7 +20,7 @@ public class Door : MonoBehaviour {
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!open)
+        if (!open && !Environment.instance.getDoorsShut())
         {
             if (collision.collider.gameObject.name == "Player" || collision.collider.gameObject.tag == "Enemy")
             {
