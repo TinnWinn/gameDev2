@@ -55,3 +55,14 @@ MonoBehaviour:
   columns: 20
   theFloor: {fileID: 1471464745559536, guid: 07fd523ccb0259e479685f815f5a2fe0, type: 2}
   theWall: {fileID: 1077562456761182, guid: b0d76aff9aeffe440ae4bd45a2e38af7, type: 2}
+  theDoor: {fileID: 1421149958170210, guid: 77fd938f0be64bf45a7c6528a1136bae, type: 2}
+  RegenRate: 0.5
+  expSlider: {fileID: 0}
+  nextButton: {fileID: 0}
+  restartButton: {fileID: 0}
+  levelUpButtons:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
