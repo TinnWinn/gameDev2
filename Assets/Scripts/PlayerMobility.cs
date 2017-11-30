@@ -149,6 +149,7 @@ public class PlayerMobility : MonoBehaviour {
             if(Environment.instance.getLevelUpReady(0))
             {
                 maxHealth = maxHealth + 5f;
+                currentHealth = maxHealth;
                 healthBar.value = calculateHealth();
                 Environment.instance.setLevelUpReady(false, 0);
             }
@@ -157,6 +158,7 @@ public class PlayerMobility : MonoBehaviour {
             {
                 maxMp = maxMp + 10f;
                 mpBar.value = calculateMp();
+                Environment.instance.setIntCurrentMp(maxMp);
                 Environment.instance.setLevelUpReady(false, 1);
             }
         }

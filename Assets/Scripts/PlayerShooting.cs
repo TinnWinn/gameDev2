@@ -9,8 +9,9 @@ public class PlayerShooting : MonoBehaviour
     float cooldownTimer = 0;
     public float fireDelay = 0.1f;
     private float skillCost1 = 2.0f;
-    private float skillCost2 = 10.0f;
-    private float skillCost3 = 5.0f;
+    private float skillCost2 = 6.0f;
+    private float skillCost3 = 10.0f;
+    private float chargeCost = 0f;
 
     private int skillSelection;
     public Image SkillIcon;
@@ -90,18 +91,29 @@ public class PlayerShooting : MonoBehaviour
             if (Input.GetMouseButton(1) && cooldownTimer <= 0 && Environment.instance.getWhichSkill() == 1 && Environment.instance.getmanaChargeState() == false && skillSelection == 2)
             {
                 cooldownTimer = fireDelay;
+                Vector3 oldTransform = fireball.transform.localScale;
                 if (fireball.transform.localScale.x < 9)
                 {
                     fireball.transform.localScale += new Vector3(2, -2, 0);
-                    fireball.GetComponent<FireBall>().baseDamage += 1.5f;
+                    chargeCost += (skillCost2 / 2f);
+                    fireball.GetComponent<FireBall>().baseDamage += 0.5f;
+                }
+                else
+                {
+                    Instantiate(fireball, offsetPosition, q);
+                    fireball.transform.localScale = new Vector3(1, -1, 1);
+                    fireball.GetComponent<FireBall>().baseDamage = 1f;
+                    Environment.instance.setCurrentMpAfterSkill(skillCost2 + chargeCost);
+                    chargeCost = 0f;
                 }
             }
-            else if (Input.GetMouseButtonUp(1) && skillSelection == 2)
+            else if (Input.GetMouseButtonUp(1) && skillSelection == 2 && Environment.instance.getmanaChargeState() == false)
             {
                 Instantiate(fireball, offsetPosition, q);
                 fireball.transform.localScale = new Vector3(1, -1, 1);
                 fireball.GetComponent<FireBall>().baseDamage = 1f;
-                Environment.instance.setCurrentMpAfterSkill(skillCost2);
+                Environment.instance.setCurrentMpAfterSkill(skillCost2 + chargeCost);
+                chargeCost = 0f;
             }
 
             if (Input.GetMouseButton(0) && cooldownTimer <= 0 && Environment.instance.getWhichSkill() == 1 && Environment.instance.getmanaChargeState() == false && skillSelection == 3)

@@ -146,7 +146,7 @@ public class Environment : MonoBehaviour
         manaCharge = true;
         while (currentMp < maxMp)
         {
-            AdjustCurrentMp(0.1f);
+            AdjustCurrentMp(0.01f);
             yield return new WaitForSeconds(RegenRate);
         }
         manaCharge = false;
