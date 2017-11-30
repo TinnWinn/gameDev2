@@ -15,6 +15,7 @@ public class BossTrigger : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        Environment.instance.setBossActive(true);
         Environment.instance.setDoorsShut(true);
     }
 }

@@ -153,6 +153,11 @@ public class PlayerShooting : MonoBehaviour
         }
     }
 
+    public void setFireRate(float theRate)
+    {
+        fireRate = theRate;
+    }
+
     /*void FixedUpdate()
     {
         var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);

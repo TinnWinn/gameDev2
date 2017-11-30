@@ -16,6 +16,7 @@ public class PlayerMobility : MonoBehaviour {
     public float currentMp { get; set; }
     public float meleDamageValue = 2;
     public float tankDamage = 10;
+    public float bossDamage = 25;
 
     //"collision" LayerMask renamed to "collisionLayer". Will require collision layer to be reset in prefabs.
     public Slider healthBar;
@@ -93,6 +94,15 @@ public class PlayerMobility : MonoBehaviour {
                 transform.Translate(translateVector * speed * Time.deltaTime, Space.World);
             
         }
+        if(collision.collider.gameObject.name == "Boss")
+        {
+            currentHealth -= bossDamage;
+            healthBar.value = calculateHealth();
+            Vector3 translateVector = Vector3.Normalize((transform.position + (Vector3)bc.offset) - collision.collider.transform.position) * 25f;
+            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, translateVector, (speed * Time.deltaTime) + 0.5f, collisionLayer);
+            if (raycast.transform == null)
+                transform.Translate(translateVector * speed * Time.deltaTime, Space.World);
+        }
         if (collision.collider.gameObject.CompareTag("enemyBullet"))
         {
             currentHealth -= meleDamageValue;
@@ -162,6 +172,11 @@ public class PlayerMobility : MonoBehaviour {
                 Environment.instance.setLevelUpReady(false, 1);
             }
         }
+    }
+
+    public void adjustHealth()
+    {
+        healthBar.value = calculateHealth();
     }
 
 	void FixedUpdate ()

@@ -35,6 +35,7 @@ public class Environment : MonoBehaviour
     public Button[] levelUpButtons;
     private int textIndex;
     private bool levelUpScreen;
+    private bool bossActive = false;
     private bool doorsShut = false;
 
     // Use this for initialization
@@ -133,6 +134,16 @@ public class Environment : MonoBehaviour
     public bool getLevelUpReady(int theIndex)
     {
         return levelUpReady[theIndex];       
+    }
+
+    public bool getBossActive()
+    {
+        return bossActive;
+    }
+
+    public void setBossActive(bool isBossActive)
+    {
+        bossActive = isBossActive;
     }
 
     void RestartGame()
