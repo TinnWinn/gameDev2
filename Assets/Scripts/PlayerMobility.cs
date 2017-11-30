@@ -17,10 +17,10 @@ public class PlayerMobility : MonoBehaviour {
     public float meleDamageValue = 2;
     public float tankDamage = 10;
 
-
+    //"collision" LayerMask renamed to "collisionLayer". Will require collision layer to be reset in prefabs.
     public Slider healthBar;
     public Slider mpBar;
-    public LayerMask collision;
+    public LayerMask collisionLayer;
     public GameObject shot;
     //public Transform shotSpawn;
 
@@ -76,16 +76,21 @@ public class PlayerMobility : MonoBehaviour {
             currentHealth -= tankDamage;
             healthBar.value = calculateHealth();
             Vector3 translateVector = Vector3.Normalize(transform.position - collision.collider.transform.position) * 20f;
-            transform.Translate(translateVector * speed * Time.deltaTime, Space.World);
+            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, translateVector, (speed * Time.deltaTime) + 0.5f, collisionLayer);
+            if(raycast.transform == null)
+                transform.Translate(translateVector * speed * Time.deltaTime, Space.World);
 
         }
+
+        //Melee Damage Changed 11/26/2017
         if (collision.collider.gameObject.CompareTag("Enemy"))
         {
             currentHealth -= meleDamageValue;
             healthBar.value = calculateHealth();
-            Vector3 translateVector = Vector3.Normalize(transform.position - collision.collider.transform.position)*5f;
-            transform.Translate(translateVector * speed * Time.deltaTime, Space.World);
-            Debug.Log(translateVector);
+            Vector3 translateVector = Vector3.Normalize((transform.position + (Vector3)bc.offset) - collision.collider.transform.position)*2.5f;
+            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, translateVector, (speed * Time.deltaTime) + 0.5f, collisionLayer);
+            if(raycast.transform == null)
+                transform.Translate(translateVector * speed * Time.deltaTime, Space.World);
             
         }
         if (collision.collider.gameObject.CompareTag("enemyBullet"))
@@ -97,13 +102,10 @@ public class PlayerMobility : MonoBehaviour {
             Debug.Log(transform.position + " " + collision.collider.transform.position + " " + translateVector);
             */
         }
-        Debug.Log(hitPoints);
         if (collision.collider.gameObject.CompareTag("HealthOrb"))
         {
             currentHealth += 2;
             healthBar.value = calculateHealth();
-            Debug.Log("Pickup health");
-            Debug.Log(currentHealth);
 
         }
         if (collision.collider.gameObject.CompareTag("MpOrb"))
@@ -144,6 +146,19 @@ public class PlayerMobility : MonoBehaviour {
 
             }
 
+            if(Environment.instance.getLevelUpReady(0))
+            {
+                maxHealth = maxHealth + 5f;
+                healthBar.value = calculateHealth();
+                Environment.instance.setLevelUpReady(false, 0);
+            }
+
+            if (Environment.instance.getLevelUpReady(1))
+            {
+                maxMp = maxMp + 10f;
+                mpBar.value = calculateMp();
+                Environment.instance.setLevelUpReady(false, 1);
+            }
         }
     }
 
@@ -165,7 +180,7 @@ public class PlayerMobility : MonoBehaviour {
     {
         if (Input.GetKey(KeyCode.W))
         {
-            RaycastHit2D raycast = Physics2D.Raycast(transform.position +(Vector3)bc.offset, Vector2.up, (speed * Time.deltaTime), collision);
+            RaycastHit2D raycast = Physics2D.Raycast(transform.position +(Vector3)bc.offset, Vector2.up, (speed * Time.deltaTime), collisionLayer);
             
             if (raycast.transform == null)
                 transform.Translate(Vector3.up * speed * Time.deltaTime, Space.World);
@@ -174,7 +189,7 @@ public class PlayerMobility : MonoBehaviour {
 
         if (Input.GetKey(KeyCode.S))
         {
-            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.down, (speed * Time.deltaTime), collision);
+            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.down, (speed * Time.deltaTime), collisionLayer);
 
             if (raycast.transform == null)
                 transform.Translate(Vector3.down * speed * Time.deltaTime, Space.World);
@@ -183,7 +198,7 @@ public class PlayerMobility : MonoBehaviour {
 
         if (Input.GetKey(KeyCode.A))
         {
-            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.left, (speed * Time.deltaTime), collision);
+            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.left, (speed * Time.deltaTime), collisionLayer);
           
             if (raycast.transform == null)
                 transform.Translate(Vector3.left * speed * Time.deltaTime, Space.World);
@@ -192,7 +207,7 @@ public class PlayerMobility : MonoBehaviour {
 
         if (Input.GetKey(KeyCode.D))
         {
-            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.right, (speed * Time.deltaTime), collision);
+            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.right, (speed * Time.deltaTime), collisionLayer);
             
             if (raycast.transform == null)
                 transform.Translate(Vector3.right * speed * Time.deltaTime, Space.World);

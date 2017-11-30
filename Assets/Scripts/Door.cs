@@ -22,8 +22,9 @@ public class Door : MonoBehaviour {
     {
         if (!open)
         {
-            if (collision.collider.gameObject.name == "Player")
+            if (collision.collider.gameObject.name == "Player" || collision.collider.gameObject.tag == "Enemy")
             {
+                Debug.Log("Door");
                 animator.enabled = true;
                 animator.Play("DoorAnim", 0, 0f);
                 MusicAndSounds.instance.playSound(doorSound);
@@ -52,11 +53,23 @@ public class Door : MonoBehaviour {
 		if(open)
         {
             Transform playerPos = GameObject.FindGameObjectWithTag("Player").transform;
+            GameObject[] enemyPos = GameObject.FindGameObjectsWithTag("Enemy");
             float xDir = playerPos.position.x - transform.position.x;
             float yDir = playerPos.position.y - transform.position.y;
             float dist = Mathf.Sqrt(Mathf.Pow(xDir, 2) + Mathf.Pow(yDir, 2));
-            if (dist > 2f)
-                closeDoor();
+            if (dist <= 2f)
+            {
+                return;
+            }
+            for(int i = 0; i < enemyPos.Length; i++)
+            {
+                xDir = enemyPos[i].transform.position.x - transform.position.x;
+                yDir = enemyPos[i].transform.position.y - transform.position.y;
+                dist = Mathf.Sqrt(Mathf.Pow(xDir, 2) + Mathf.Pow(yDir, 2));
+                if (dist <= 2f)
+                    return;
+            }
+            closeDoor();
         }
 	}
 }

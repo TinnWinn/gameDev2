@@ -4,17 +4,36 @@ using UnityEngine;
 
 public class BoltScript : MonoBehaviour {
 
-	private Rigidbody rb;
+    public AudioClip soundEffect;
+	private Rigidbody2D rb;
+    private string targetTag = "Enemy";
+    private string wallTag = "Environment";
 	public float speed;
+    public int baseDamage = 1;
 
 	// Use this for initialization
 	void Start () {
-		rb = GetComponent <Rigidbody> ();
-		rb.velocity = transform.forward * speed;
+        MusicAndSounds.instance.playSound(soundEffect);
+		rb = GetComponent <Rigidbody2D> ();
+		rb.velocity = transform.up * speed;
+        Destroy(gameObject, 3f);
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag(targetTag))
+        {
+            other.gameObject.GetComponent<EnemyScript>().hitPoints -= baseDamage;
+            Destroy(gameObject);
+        }
+        if(other.gameObject.CompareTag(targetTag))
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    // Update is called once per frame
+    void Update () {
 		
 	}
 }

@@ -20,6 +20,16 @@ public class MusicAndSounds : MonoBehaviour {
     public void playSound(AudioClip theSound)
     {
         soundEffectSource.clip = theSound;
+        soundEffectSource.pitch = 1;
+        soundEffectSource.timeSamples = 0;
+        soundEffectSource.Play();
+    }
+
+    public void playSoundFast(AudioClip theSound, float thePitch)
+    {
+        soundEffectSource.clip = theSound;
+        soundEffectSource.pitch = thePitch;
+        soundEffectSource.timeSamples = theSound.samples / 2;
         soundEffectSource.Play();
     }
 

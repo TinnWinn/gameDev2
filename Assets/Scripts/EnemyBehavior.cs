@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyBehavior : MonoBehaviour
+public class EnemyBehavior : EnemyScript
 {
 
     private bool Death = false;
     private bool dropHealth = true;
     private bool dropMp = true;
-    public float speed;
-    public int hitPoints = 4;
     public float timer = 5.0f;
     public float chaseRange;
     //public Transform SpawnSpot;
 
-    public LayerMask collision;
+    //Collision renamed to CollisionLayer. Will require prefabs to be reset.
+    public LayerMask collisionLayer;
     public GameObject healthPrefab; 
     public GameObject mpPrefab;
 
@@ -26,11 +25,14 @@ public class EnemyBehavior : MonoBehaviour
 
     Animator anim;
 
+    //New boolean for giving EXP
+    private bool expGranted = false;
+
     // Use this for initialization
     void Start()
     {
+        shot = new GameObject();
         drop = Random.Range(0f, 1f);
-        Debug.Log(drop);
         bc = GetComponent<BoxCollider2D>();
         rb = GetComponent<Rigidbody2D>();
         target = GameObject.FindGameObjectWithTag("Player").transform;
@@ -48,7 +50,13 @@ public class EnemyBehavior : MonoBehaviour
         }
         if (collision.collider.gameObject.CompareTag("Enemy"))
             Debug.Log("Collision with Enemy");
-
+        if(collision.collider.gameObject.CompareTag("Player"))
+        {
+            Vector3 translateVector = Vector3.Normalize((transform.position + (Vector3)bc.offset) - collision.collider.transform.position) * 2.5f;
+            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, translateVector, (speed * Time.deltaTime) + 0.5f, collisionLayer);
+            if (raycast.transform == null)
+                transform.Translate(translateVector * speed * Time.deltaTime, Space.World);
+        }
         Debug.Log(hitPoints);
     }
 
@@ -61,25 +69,25 @@ public class EnemyBehavior : MonoBehaviour
             yDir = target.position.y > transform.position.y ? 1 : -1;
         if (xDir == -1)
         {
-            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.left, (speed * Time.deltaTime), collision);
+            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.left, (speed * Time.deltaTime), collisionLayer);
             if (raycast.transform == null)
                 transform.Translate(Vector3.left * speed * Time.deltaTime, Space.World);
         }
         else if (xDir == 1)
         {
-            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.right, (speed * Time.deltaTime), collision);
+            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.right, (speed * Time.deltaTime), collisionLayer);
             if (raycast.transform == null)
                 transform.Translate(Vector3.right * speed * Time.deltaTime, Space.World);
         }
         else if (yDir == -1)
         {
-            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.down, (speed * Time.deltaTime), collision);
+            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.down, (speed * Time.deltaTime), collisionLayer);
             if (raycast.transform == null)
                 transform.Translate(Vector3.down * speed * Time.deltaTime, Space.World);
         }
         else if (yDir == 1)
         {
-            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.up, (speed * Time.deltaTime), collision);
+            RaycastHit2D raycast = Physics2D.Raycast(transform.position + (Vector3)bc.offset, Vector2.up, (speed * Time.deltaTime), collisionLayer);
             if (raycast.transform == null)
                 transform.Translate(Vector3.up * speed * Time.deltaTime, Space.World);
         }
@@ -118,6 +126,7 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
     */
+    // EXP addition added to death 11/26/2017.
     // Update is called once per frame
     void Update()
     {
@@ -156,6 +165,11 @@ public class EnemyBehavior : MonoBehaviour
                         Instantiate(mpPrefab, this.transform.position, this.transform.rotation);
                         dropMp = false;
                     }
+                }
+                if (!expGranted)
+                {
+                    Environment.instance.giveEXP(20);
+                    expGranted = true;
                 }
                 Destroy(gameObject, 1.0f);
             }

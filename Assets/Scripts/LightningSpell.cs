@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class LightningSpell : AbilitySystem  {
 
+    public AudioClip soundEffect;
 	private EnemyScript enemy;
 	private Shock stun;
 	private const string aName = "Lightning Spell";
@@ -20,6 +21,7 @@ public class LightningSpell : AbilitySystem  {
 	private Stopwatch durationTimer = new Stopwatch();
 
 	void Start () {
+        MusicAndSounds.instance.playSoundFast(soundEffect, 1f);
 		rb = GetComponent <Rigidbody2D> ();
 		rb.velocity = transform.up * speed;
 		Destroy (gameObject, 3f);

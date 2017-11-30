@@ -7,6 +7,9 @@ using UnityEngine.SceneManagement;
 public class Environment : MonoBehaviour
 {
 
+    private string[] introLines = { "I meant only to create a basic potion. That's how it began.", "I knocked over a vial on the shelf, one meant to be added to the potion much later than it was. The results were catastrophic.", "I awoke surrounded by homunculi bent on my destruction...", "(Use W to move up, A to move left, S to move down, and D to move right. Use the mouse to aim your spells and the left mouse button to fire them.)", "(The red bar represents your health points. The blue bar represents your mana points. The yellow bar represents your experience points.)", "(When your mana points run out, you will have to wait until they recharge fully to cast spells again.)" };
+    private string[] levelUpLines = { "Perhaps I lost some of my power coming to this place. Nevertheless, the longer I am here, I feel it returning to me.", "(You have gained a level. You may improve Samuel's health, his mana, or his spells. You may also unlock new spells if you have not already done so.)", "Choose an upgrade:" };
+    private string[] currentScroll;
     private Transform theEnvironment;
     public static Environment instance = null;
     public int rows = 16;
@@ -22,19 +25,38 @@ public class Environment : MonoBehaviour
     private float maxMp;
     public GameObject theDoor;
     public float RegenRate = .5f;
+    public Slider expSlider;
+    private float currentExp;
+    private float toNextLevel;
+    private bool[] levelUpReady = { false, false, false, false, false };
+    private bool[] unlockedSkill = { false, false };
+    public Button nextButton;
+    public Button restartButton;
+    public Button[] levelUpButtons;
+    private int textIndex;
+    private bool levelUpScreen;
 
     // Use this for initialization
     void Awake()
     {
-        whichSkill = 1;
         
         if (instance == null)
             instance = this;
         else if (instance != this)
             Destroy(gameObject);
         DontDestroyOnLoad(gameObject);
+        nextButton.onClick.AddListener(delegate { NextLine(); });
+        restartButton.onClick.AddListener(delegate { RestartGame(); });
+        for (int i = 0; i < levelUpButtons.Length; i++)
+        {
+            int buttonCode = i;
+            levelUpButtons[i].onClick.AddListener(()=>ImproveStat(buttonCode));
+        }
+        whichSkill = 1;
         theEnvironment = new GameObject("Environment").transform;
-
+        currentExp = 0f;
+        toNextLevel = 15f;
+        expSlider.value = currentExp / toNextLevel;
         
         /*
         Room1();
@@ -72,7 +94,6 @@ public class Environment : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("currentMp :" + currentMp);
         if (currentMp <= 0)
         {
             manaCharge = true;
@@ -83,6 +104,34 @@ public class Environment : MonoBehaviour
         {
             StartCoroutine(RegainMpOverTime());
         }
+
+        checkExpLevel();
+    }
+
+    void checkExpLevel()
+    {
+        if(currentExp >= toNextLevel)
+        {
+            LevelUp();
+            currentExp -= toNextLevel;
+            toNextLevel += 5;
+        }
+        expSlider.value = currentExp / toNextLevel;
+    }
+
+    public void giveEXP(int numPoints)
+    {
+        currentExp += (float)numPoints;
+    }
+
+    public void setLevelUpReady(bool theValue, int theIndex)
+    {
+        levelUpReady[theIndex] = theValue;
+    }
+
+    public bool getLevelUpReady(int theIndex)
+    {
+        return levelUpReady[theIndex];       
     }
 
     void RestartGame()
@@ -129,21 +178,65 @@ public class Environment : MonoBehaviour
 
     public void gameOver()
     {
+        MusicAndSounds.instance.musicSource.Stop();
         doingSetup = true;
-        LevelText.color = Color.red;
-        LevelText.text = "GAME OVER";
+        LevelText.text = "Game over.";
+        restartButton.gameObject.SetActive(true);
+        nextButton.gameObject.SetActive(false);
+        for (int i = 0; i < levelUpButtons.Length; i++)
+            levelUpButtons[i].gameObject.SetActive(false);
         LevelImage.SetActive(true);
-        Invoke("RestartGame", 2.0f);
     }
 
     void StartScene()
     {
+        levelUpScreen = false;
+        textIndex = 0;
+        currentScroll = introLines;
+        restartButton.gameObject.SetActive(false);
+        nextButton.gameObject.SetActive(true);
+        for (int i = 0; i < levelUpButtons.Length; i++)
+            levelUpButtons[i].gameObject.SetActive(false);
         doingSetup = true;
         LevelImage = GameObject.Find("LevelImage");
         LevelText = GameObject.Find("LevelText").GetComponent<Text>();
-        LevelText.text = "I awoke surrounded by homunculi bent on my destruction...";
+        LevelText.text = introLines[textIndex];
         LevelImage.SetActive(true);
-        Invoke("HideLevelImage", 2f);
+    }
+
+    private void NextLine()
+    {
+        if (textIndex < currentScroll.Length - 1)
+        {
+            textIndex++;
+            LevelText.text = currentScroll[textIndex];
+        }
+        else
+        {
+            if (levelUpScreen)
+            {
+                nextButton.gameObject.SetActive(false);
+                restartButton.gameObject.SetActive(false);
+                for (int i = 0; i < 3; i++)
+                    levelUpButtons[i].gameObject.SetActive(true);
+                if (unlockedSkill[0])
+                {
+                    levelUpButtons[3].GetComponentInChildren<Text>().text = "Improve Fireball";
+                    levelUpButtons[4].gameObject.SetActive(true);
+                }
+                levelUpButtons[3].gameObject.SetActive(true);
+                if (unlockedSkill[1])
+                {
+                    levelUpButtons[4].GetComponentInChildren<Text>().text = "Improve Lightning";
+                    levelUpButtons[4].gameObject.SetActive(true);
+                }
+            }
+            else
+            {
+                LevelImage.SetActive(false);
+                Invoke("HideLevelImage", 0.5f);
+            }
+        }
     }
 
     public int getWhichSkill()
@@ -436,5 +529,36 @@ public class Environment : MonoBehaviour
                 GameObject instance = Instantiate(toInstantiate, new Vector3(i, j, 0f), Quaternion.identity) as GameObject;
                 instance.transform.SetParent(theEnvironment);
             }
+    }
+
+    void LevelUp()
+    {
+        levelUpScreen = true;
+        doingSetup = true;
+        textIndex = 0;
+        currentScroll = levelUpLines;
+        LevelText.text = levelUpLines[textIndex];
+        nextButton.gameObject.SetActive(true);
+        restartButton.gameObject.SetActive(false);
+        for (int i = 0; i < levelUpButtons.Length; i++)
+            levelUpButtons[i].gameObject.SetActive(false);
+        LevelImage.SetActive(true);
+    }
+
+    public bool getSkillUnlocked(int theIndex)
+    {
+        return unlockedSkill[theIndex];
+    }
+
+    void ImproveStat(int statCode)
+    {
+        Debug.Log(statCode);
+        levelUpReady[statCode] = true;
+        if (statCode == 3 && !unlockedSkill[0])
+            unlockedSkill[0] = true;
+        if (statCode == 4 && !unlockedSkill[1])
+            unlockedSkill[1] = true;
+        LevelImage.SetActive(false);
+        doingSetup = false;
     }
 }

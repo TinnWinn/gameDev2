@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class FireBall : AbilitySystem  {
 
+    public AudioClip soundEffect;
 	private DamageOverTime dot;
 	private const string aName = "Fire Ball";
 	private const string aDescription = "A fire spell that deals DOT";
@@ -27,6 +28,7 @@ public class FireBall : AbilitySystem  {
 	private float damageTickDuration = 1f;
 
 	void Start () {
+        MusicAndSounds.instance.playSoundFast(soundEffect, 3f);
 		rb = GetComponent <Rigidbody2D> ();
 		rb.velocity = transform.up * speed;
 		dot = GetComponent <DamageOverTime> ();
@@ -69,7 +71,7 @@ public class FireBall : AbilitySystem  {
 		durationTimer.Start ();
 		while (durationTimer.Elapsed.TotalSeconds <= effectDuration) {
 			objectHit.GetComponent<EnemyScript>().hitPoints -= baseEffectDamage;
-			DestroyImmediate(gameObject);
+			Destroy(gameObject);
 			yield return new WaitForSeconds(damageTickDuration);
 
 		}
