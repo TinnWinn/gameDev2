@@ -59,16 +59,17 @@ public class Environment : MonoBehaviour
         toNextLevel = 15f;
         expSlider.value = currentExp / toNextLevel;
         
-        /*
+        
         Room1();
         Hall1(6, 22);
         Room2(0, 64);
         Hall1(6, 86);
         SpecialHall(-30, 128);
-        Room3(-52, 122);
+        //Room3(-52, 122);
         Room4(52, 122);
-        Hall1(-46, 144);
         Hall1(58, 144);
+        BossRoom(27, 186);
+        /*Hall1(-46, 144);
         Room5(-52, 186);
         Hall2(-30, 192);
         Room6(12, 186);
@@ -88,9 +89,8 @@ public class Environment : MonoBehaviour
         Hall1(58, 208);
         Hall1(-110, 272);
         Room11(-116, 314);
-        Hall1(-46, 272);
-        BossRoom(-77, 314);*/
-        
+        Hall1(-46, 272);*/
+
     }
 
     void Update()
@@ -526,7 +526,7 @@ public class Environment : MonoBehaviour
                 GameObject toInstantiate = theFloor;
                 if (i == (left - 1) || i == (left + 8) || j == (bottom - 1) || j == (bottom + 80))
                     toInstantiate = theWall;
-                if ((i == (left + 4) && j == (bottom - 1)) || (i == (left + 4) && j == (bottom + 80)))
+                if ((i == (left + 4) && j == (bottom + 80)))
                     toInstantiate = theDoor;
                 GameObject instance = Instantiate(toInstantiate, new Vector3(i, j, 0f), Quaternion.identity) as GameObject;
                 instance.transform.SetParent(theEnvironment);

@@ -64,6 +64,14 @@ public class PlayerShooting : MonoBehaviour
             pos.z = transform.position.z - Camera.main.transform.position.z;
             pos = Camera.main.ScreenToWorldPoint(pos);
 
+            Vector2 mouseDir = Camera.main.ScreenToWorldPoint(Input.mousePosition) - shotSpawn.position;
+            /*float angle = Mathf.Atan2(mouseDir.y, mouseDir.x) * Mathf.Rad2Deg;
+            Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            shotSpawn.rotation = Quaternion.Slerp(shotSpawn.rotation, rotation, 5f * Time.deltaTime);*/
+            shotSpawn.up = mouseDir;
+            shotSpawn2.up = Quaternion.Euler(0, 0, -10) * mouseDir;
+            shotSpawn3.up = Quaternion.Euler(0, 0, 10) * mouseDir;
+
             var q = Quaternion.FromToRotation(Vector3.up, pos - transform.position);
             Vector3 offsetPosition = q * new Vector3(0.5f, 0f, 0f);
             //Debug.Log("Offset: " + offsetPosition);
@@ -145,7 +153,7 @@ public class PlayerShooting : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    /*void FixedUpdate()
     {
         var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Quaternion rot = Quaternion.LookRotation(transform.position - mousePosition, Vector3.forward);
@@ -163,6 +171,6 @@ public class PlayerShooting : MonoBehaviour
         shotSpawn3.localPosition = new Vector3(Mathf.Clamp(relativePos.x, 0, 0), Mathf.Clamp(relativePos.y, 0, 0), 0);
         shotSpawn3.rotation = rot;
         shotSpawn3.eulerAngles = new Vector3(0, 0, shotSpawn.eulerAngles.z - 10);
-    }
+    }*/
     
 }
